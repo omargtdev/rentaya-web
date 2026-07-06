@@ -1,0 +1,186 @@
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-900">Registro de usuario</h1>
+      <p class="text-sm text-gray-500">HU01 / HU02 - Alta de propietario e inquilino con validaciones</p>
+    </div>
+
+    <!-- Two column layout -->
+    <div class="grid grid-cols-1 md:grid-cols-[40%_60%] gap-6">
+      <!-- Left card - Info panel -->
+      <div class="bg-primary-50 border border-primary-100 rounded-xl p-6 h-fit">
+        <h2 class="text-xl font-bold text-primary-600 mb-4">Publica y alquila sin intermediarios</h2>
+        <p class="text-sm text-gray-600 mb-6">
+          Crea una cuenta para buscar inmuebles, contactar propietarios, publicar propiedades o gestionar solicitudes de visita.
+        </p>
+        <ul class="space-y-3">
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-success-600 rounded-full flex-shrink-0"></span>
+            <span class="text-gray-700 text-sm">Correo único</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-success-600 rounded-full flex-shrink-0"></span>
+            <span class="text-gray-700 text-sm">Contraseña segura</span>
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="w-2 h-2 bg-success-600 rounded-full flex-shrink-0"></span>
+            <span class="text-gray-700 text-sm">Rol diferenciado</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Right card - Form -->
+      <div class="bg-white border border-gray-200 rounded-xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-6">Crear cuenta</h2>
+
+        <!-- Success banner -->
+        @if (successMessage) {
+          <div class="bg-success-50 border border-success-600 text-success-700 rounded-lg px-4 py-3 mb-4">
+            {{ successMessage }}
+          </div>
+        }
+
+        <!-- Error banner -->
+        @if (errorMessage) {
+          <div class="bg-danger-50 border border-danger-600 text-danger-700 rounded-lg px-4 py-3 mb-4">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+          <!-- Role selector -->
+          <div class="mb-6">
+            <div class="grid grid-cols-2 gap-2">
+              <label class="cursor-pointer">
+                <input type="radio" formControlName="role" value="INQUILINO" class="sr-only peer">
+                <div class="text-center py-2 rounded-lg font-medium transition-colors peer-checked:bg-primary-600 peer-checked:text-white bg-white border border-gray-300 text-gray-700">
+                  Inquilino
+                </div>
+              </label>
+              <label class="cursor-pointer">
+                <input type="radio" formControlName="role" value="PROPIETARIO" class="sr-only peer">
+                <div class="text-center py-2 rounded-lg font-medium transition-colors peer-checked:bg-primary-600 peer-checked:text-white bg-white border border-gray-300 text-gray-700">
+                  Propietario
+                </div>
+              </label>
+            </div>
+          </div>
+
+          <!-- Form fields grid -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <!-- First name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Nombres <span class="text-danger-600">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="firstName"
+                placeholder="Ej. Omar"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                [class.border-danger-600]="firstName?.invalid && firstName?.touched"
+                [class.focus:ring-danger-500]="firstName?.invalid && firstName?.touched"
+              >
+              @if (firstName?.invalid && firstName?.touched) {
+                <p class="text-sm text-danger-600 mt-1">El nombre es obligatorio</p>
+              }
+            </div>
+
+            <!-- Last name -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Apellidos <span class="text-danger-600">*</span>
+              </label>
+              <input
+                type="text"
+                formControlName="lastName"
+                placeholder="Ej. Gutierrez"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                [class.border-danger-600]="lastName?.invalid && lastName?.touched"
+                [class.focus:ring-danger-500]="lastName?.invalid && lastName?.touched"
+              >
+              @if (lastName?.invalid && lastName?.touched) {
+                <p class="text-sm text-danger-600 mt-1">El apellido es obligatorio</p>
+              }
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="mb-4">
+            <label class="block text-sm font-medium text-gray-700 mb-1">
+              Correo electrónico <span class="text-danger-600">*</span>
+            </label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="usuario@correo.com"
+              class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+              [class.border-danger-600]="email?.invalid && email?.touched"
+              [class.focus:ring-danger-500]="email?.invalid && email?.touched"
+            >
+            @if (email?.invalid && email?.touched) {
+              <p class="text-sm text-danger-600 mt-1">Ingresa un correo válido</p>
+            }
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+            <!-- Phone -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Teléfono <span class="text-danger-600">*</span>
+              </label>
+              <input
+                type="tel"
+                formControlName="phone"
+                placeholder="987654321"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                [class.border-danger-600]="phone?.invalid && phone?.touched"
+                [class.focus:ring-danger-500]="phone?.invalid && phone?.touched"
+              >
+              @if (phone?.invalid && phone?.touched) {
+                <p class="text-sm text-danger-600 mt-1">Ingresa un teléfono válido</p>
+              }
+            </div>
+
+            <!-- Password -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Contraseña <span class="text-danger-600">*</span>
+              </label>
+              <input
+                type="password"
+                formControlName="password"
+                placeholder="••••••••"
+                class="w-full border border-gray-300 rounded-lg px-3 py-2 focus:border-primary-500 focus:ring-1 focus:ring-primary-500 outline-none transition-colors"
+                [class.border-danger-600]="password?.invalid && password?.touched"
+                [class.focus:ring-danger-500]="password?.invalid && password?.touched"
+              >
+              <p class="text-xs text-gray-400 mt-1">Mínimo 8 caracteres, 1 mayúscula y 1 número</p>
+              @if (password?.invalid && password?.touched) {
+                <p class="text-sm text-danger-600 mt-1">Mínimo 8 caracteres, 1 mayúscula y 1 número</p>
+              }
+            </div>
+          </div>
+
+          <!-- Submit button -->
+          <button
+            type="submit"
+            [disabled]="registerForm.invalid || loading"
+            class="w-full bg-primary-600 hover:bg-primary-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-semibold rounded-lg py-2 transition-colors flex items-center justify-center gap-2"
+          >
+            @if (loading) {
+              <svg class="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Registrando...</span>
+            } @else {
+              <span>Registrarme</span>
+            }
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
