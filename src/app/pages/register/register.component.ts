@@ -1,8 +1,7 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs/operators';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 
 @Component({
@@ -15,6 +14,7 @@ export class RegisterComponent {
   private fb = inject(FormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private cdr = inject(ChangeDetectorRef);
 
   loading = false;
   successMessage = '';
@@ -49,16 +49,19 @@ export class RegisterComponent {
     const request: RegisterRequest = this.registerForm.value as RegisterRequest;
 
     this.authService.register(request)
-      .pipe(finalize(() => this.loading = false))
       .subscribe({
         next: () => {
+          this.loading = false;
           this.successMessage = 'Cuenta creada exitosamente. Redirigiendo al login...';
+          this.cdr.detectChanges();
           setTimeout(() => {
             this.router.navigate(['/login']);
           }, 2000);
         },
         error: (err: Error) => {
+          this.loading = false;
           this.errorMessage = err.message;
+          this.cdr.detectChanges();
         }
       });
   }
