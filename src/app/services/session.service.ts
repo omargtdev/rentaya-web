@@ -32,7 +32,7 @@ export class SessionService {
     role: 'PROPIETARIO'
   };
 
-  readonly currentUser = signal<User>(this.tenantMock);
+  readonly currentUser = signal<User>(this.ownerMock);
 
   get isOwner(): boolean {
     return this.currentUser().role === 'PROPIETARIO';
@@ -44,5 +44,14 @@ export class SessionService {
 
   setRole(role: UserRole): void {
     this.currentUser.set(role === 'PROPIETARIO' ? this.ownerMock : this.tenantMock);
+  }
+
+  updateUser(partial: Partial<Omit<User, 'id' | 'role'>>): void {
+    this.currentUser.update(u => ({ ...u, ...partial }));
+  }
+
+  logout(): void {
+    // Reset to owner mock (default for next login)
+    this.currentUser.set(this.ownerMock);
   }
 }

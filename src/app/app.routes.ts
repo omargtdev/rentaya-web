@@ -10,6 +10,10 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
   },
   {
+    path: 'profile',
+    loadComponent: () => import('./pages/profile/profile').then(m => m.ProfileComponent)
+  },
+  {
     path: 'properties',
     loadComponent: () =>
       import('./pages/properties/properties-list/properties-list').then(m => m.PropertiesListComponent)
@@ -42,6 +46,6 @@ export const routes: Routes = [
     path: 'messages',
     loadComponent: () => import('./pages/messages/messages').then(m => m.MessagesComponent)
   },
-  { path: '', redirectTo: '/properties', pathMatch: 'full' },
-  { path: '**', redirectTo: '/properties' }
+  { path: '', redirectTo: '/login', pathMatch: 'full' },
+  { path: '**', redirectTo: '/login' }
 ];
