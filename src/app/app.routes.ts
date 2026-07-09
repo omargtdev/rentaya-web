@@ -9,5 +9,39 @@ export const routes: Routes = [
     path: 'login',
     loadComponent: () => import('./pages/login/login.component').then(m => m.LoginComponent)
   },
-  { path: '', redirectTo: '/register', pathMatch: 'full' }
+  {
+    path: 'properties',
+    loadComponent: () =>
+      import('./pages/properties/properties-list/properties-list').then(m => m.PropertiesListComponent)
+  },
+  {
+    path: 'properties/new',
+    loadComponent: () =>
+      import('./pages/properties/property-form/property-form').then(m => m.PropertyFormComponent)
+  },
+  {
+    path: 'properties/:id/edit',
+    loadComponent: () =>
+      import('./pages/properties/property-form/property-form').then(m => m.PropertyFormComponent)
+  },
+  {
+    path: 'properties/:id',
+    loadComponent: () =>
+      import('./pages/properties/property-detail/property-detail').then(m => m.PropertyDetailComponent)
+  },
+  {
+    path: 'favorites',
+    loadComponent: () => import('./pages/favorites/favorites').then(m => m.FavoritesComponent)
+  },
+  {
+    path: 'visits',
+    loadComponent: () =>
+      import('./pages/visits/visit-requests/visit-requests').then(m => m.VisitRequestsComponent)
+  },
+  {
+    path: 'messages',
+    loadComponent: () => import('./pages/messages/messages').then(m => m.MessagesComponent)
+  },
+  { path: '', redirectTo: '/properties', pathMatch: 'full' },
+  { path: '**', redirectTo: '/properties' }
 ];

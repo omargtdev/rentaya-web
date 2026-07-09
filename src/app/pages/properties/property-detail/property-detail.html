@@ -1,0 +1,128 @@
+<app-navbar></app-navbar>
+
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+
+    @if (loading) {
+      <p class="text-gray-500 text-sm">Cargando propiedad...</p>
+    } @else if (notFound) {
+      <div class="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
+        Propiedad no disponible.
+        <div class="mt-4">
+          <a routerLink="/properties" class="text-primary-600 font-medium">Volver al listado</a>
+        </div>
+      </div>
+    } @else if (property) {
+      <div class="mb-6">
+        <a routerLink="/properties" class="text-sm text-gray-500 hover:text-primary-600">&larr; Volver al listado</a>
+        <h1 class="text-2xl font-bold text-gray-900 mt-2">Detalle completo de propiedad</h1>
+        <p class="text-sm text-gray-500">HU05 / HU06 / HU08 / HU09 - Galería, ficha técnica y acciones principales</p>
+      </div>
+
+      @if (visitSuccess) {
+        <div class="bg-success-50 border border-success-600 text-success-700 rounded-lg px-4 py-3 mb-4">
+          {{ visitSuccess }}
+        </div>
+      }
+
+      <div class="grid grid-cols-1 md:grid-cols-[60%_40%] gap-6">
+        <!-- Galería -->
+        <div class="bg-white border border-gray-200 rounded-xl p-4">
+          <div class="h-72 bg-gray-100 rounded-lg overflow-hidden mb-3">
+            <img [src]="property.photos[activePhotoIndex]" [alt]="property.title" class="w-full h-full object-cover">
+          </div>
+          <div class="flex gap-2">
+            @for (photo of property.photos; track photo; let i = $index) {
+              <button (click)="selectPhoto(i)"
+                      class="w-16 h-16 rounded-lg overflow-hidden border-2"
+                      [class.border-primary-600]="i === activePhotoIndex"
+                      [class.border-transparent]="i !== activePhotoIndex">
+                <img [src]="photo" class="w-full h-full object-cover" alt="Foto {{ i + 1 }}">
+              </button>
+            }
+          </div>
+
+          <h2 class="text-xl font-bold text-gray-900 mt-4">{{ property.title }}</h2>
+          <p class="text-sm text-gray-500">{{ property.address }} · {{ property.district }}</p>
+        </div>
+
+        <!-- Info -->
+        <div class="bg-white border border-gray-200 rounded-xl p-6 h-fit">
+          <p class="text-2xl font-bold text-primary-600">S/ {{ property.price | number }} / mes</p>
+          <p class="text-sm text-gray-500 mb-4">
+            {{ property.rooms }} habitaciones · {{ property.bathrooms }} baño{{ property.bathrooms > 1 ? 's' : '' }}
+            @if (property.area) { · {{ property.area }} m² }
+          </p>
+
+          <h3 class="text-sm font-semibold text-gray-900 mb-1">Descripción</h3>
+          <p class="text-sm text-gray-600 mb-4">{{ property.description }}</p>
+
+          <div class="bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 mb-4">
+            <p class="text-sm font-semibold text-gray-900">Propietario: {{ property.ownerName }}</p>
+            <p class="text-xs text-gray-500">Datos públicos visibles para contacto</p>
+          </div>
+
+          @if (isOwnerOfProperty) {
+            <!-- HU10: acciones del propietario dueño de la publicación -->
+            <div class="flex gap-3">
+              <button (click)="goToEdit()"
+                      class="flex-1 border border-primary-600 text-primary-600 rounded-lg py-2 font-semibold hover:bg-primary-50 transition-colors">
+                Editar
+              </button>
+              <button (click)="askDelete()"
+                      class="flex-1 border border-danger-600 text-danger-600 rounded-lg py-2 font-semibold hover:bg-danger-50 transition-colors">
+                Eliminar
+              </button>
+            </div>
+          } @else {
+            <div class="flex gap-3 mb-3">
+              <button (click)="openVisitModal()"
+                      class="flex-1 bg-primary-600 hover:bg-primary-700 text-white rounded-lg py-2 font-semibold transition-colors">
+                Agendar visita
+              </button>
+              <button (click)="contactOwner()"
+                      class="flex-1 bg-success-600 hover:bg-success-700 text-white rounded-lg py-2 font-semibold transition-colors">
+                Contactar
+              </button>
+            </div>
+            <button (click)="toggleFavorite()"
+                    class="w-full border rounded-lg py-2 font-medium transition-colors"
+                    [class.border-danger-600]="isFavorite"
+                    [class.text-danger-600]="isFavorite"
+                    [class.border-gray-300]="!isFavorite"
+                    [class.text-gray-600]="!isFavorite">
+              {{ isFavorite ? '♥ Quitado de favoritos' : '♡ Guardar en favoritos' }}
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+@if (showVisitModal && property) {
+  <app-visit-modal
+    [propertyTitle]="property.title"
+    [submitting]="visitSubmitting"
+    [errorMessage]="visitError"
+    (confirmed)="confirmVisit($event)"
+    (closed)="closeVisitModal()"
+  ></app-visit-modal>
+}
+
+@if (showDeleteConfirm) {
+  <div class="fixed inset-0 bg-black/40 flex items-center justify-center px-4 z-50">
+    <div class="bg-white rounded-xl shadow-lg w-full max-w-sm p-6">
+      <h3 class="text-lg font-bold text-gray-900 mb-2">Eliminar propiedad</h3>
+      <p class="text-sm text-gray-600 mb-6">¿Confirmas que deseas eliminar esta publicación? Esta acción no se puede deshacer.</p>
+      <div class="flex gap-3">
+        <button (click)="cancelDelete()" class="flex-1 border border-gray-300 text-gray-700 rounded-lg py-2 font-medium hover:bg-gray-50 transition-colors">
+          Cancelar
+        </button>
+        <button (click)="confirmDelete()" class="flex-1 bg-danger-600 hover:bg-danger-700 text-white rounded-lg py-2 font-semibold transition-colors">
+          Eliminar
+        </button>
+      </div>
+    </div>
+  </div>
+}

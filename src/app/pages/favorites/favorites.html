@@ -1,0 +1,29 @@
+<app-navbar></app-navbar>
+
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Mis favoritos</h1>
+      <p class="text-sm text-gray-500">HU09 - Persistencia de propiedades guardadas y acceso rápido</p>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl p-6">
+      @if (loading) {
+        <p class="text-gray-500 text-sm">Cargando favoritos...</p>
+      } @else if (properties.length === 0) {
+        <div class="text-center py-10">
+          <p class="font-semibold text-gray-900 mb-1">Estado vacío</p>
+          <p class="text-sm text-gray-500 mb-4">Aún no has guardado propiedades favoritas</p>
+          <a routerLink="/properties" class="text-primary-600 font-medium text-sm">Explorar propiedades</a>
+        </div>
+      } @else {
+        <p class="text-sm text-gray-500 mb-4">El usuario mantiene sus favoritos aunque cierre sesión.</p>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          @for (property of properties; track property.id) {
+            <app-property-card [property]="property" (favoriteToggled)="onFavoriteToggled()"></app-property-card>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

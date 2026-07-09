@@ -1,0 +1,103 @@
+<app-navbar></app-navbar>
+
+<div class="min-h-screen bg-gray-50 py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Gestión de solicitudes de visita</h1>
+      <p class="text-sm text-gray-500">HU07 - Panel del propietario para aceptar/rechazar y filtrar solicitudes</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+      <div class="bg-white border border-gray-200 rounded-xl p-4">
+        <p class="text-sm text-gray-500">Pendientes</p>
+        <p class="text-2xl font-bold text-orange-500">{{ pendingCount() }}</p>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4">
+        <p class="text-sm text-gray-500">Aceptadas</p>
+        <p class="text-2xl font-bold text-success-600">{{ acceptedCount() }}</p>
+      </div>
+      <div class="bg-white border border-gray-200 rounded-xl p-4">
+        <p class="text-sm text-gray-500">Rechazadas</p>
+        <p class="text-2xl font-bold text-danger-600">{{ rejectedCount() }}</p>
+      </div>
+    </div>
+
+    <div class="bg-white border border-gray-200 rounded-xl p-5">
+      <div class="flex items-center justify-between mb-4 flex-wrap gap-3">
+        <h2 class="font-semibold text-gray-900">Solicitudes recibidas</h2>
+        <div class="flex gap-2 flex-wrap">
+          @for (option of statusOptions; track option) {
+            <button (click)="setFilter(option)"
+                    class="text-sm px-3 py-1.5 rounded-lg border transition-colors"
+                    [class.bg-primary-600]="activeFilter() === option"
+                    [class.text-white]="activeFilter() === option"
+                    [class.border-primary-600]="activeFilter() === option"
+                    [class.bg-white]="activeFilter() !== option"
+                    [class.text-gray-600]="activeFilter() !== option"
+                    [class.border-gray-300]="activeFilter() !== option">
+              {{ option }}
+            </button>
+          }
+        </div>
+      </div>
+
+      @if (loading) {
+        <p class="text-gray-500 text-sm">Cargando solicitudes...</p>
+      } @else if (filteredVisits().length === 0) {
+        <p class="text-gray-500 text-sm text-center py-8">No hay solicitudes en este estado.</p>
+      } @else {
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-gray-500 border-b border-gray-200">
+                <th class="py-2 pr-4">Inquilino</th>
+                <th class="py-2 pr-4">Propiedad</th>
+                <th class="py-2 pr-4">Fecha</th>
+                <th class="py-2 pr-4">Hora</th>
+                <th class="py-2 pr-4">Estado</th>
+                <th class="py-2 pr-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (visit of filteredVisits(); track visit.id) {
+                <tr class="border-b border-gray-100">
+                  <td class="py-3 pr-4 font-medium text-gray-900">{{ visit.tenantName }}</td>
+                  <td class="py-3 pr-4 text-gray-600">{{ visit.propertyTitle }}</td>
+                  <td class="py-3 pr-4 text-gray-600">{{ visit.date }}</td>
+                  <td class="py-3 pr-4 text-gray-600">{{ visit.time }}</td>
+                  <td class="py-3 pr-4">
+                    <span class="text-xs font-semibold px-2 py-1 rounded-full"
+                          [class.bg-orange-50]="visit.status === 'Pendiente'"
+                          [class.text-orange-600]="visit.status === 'Pendiente'"
+                          [class.bg-success-50]="visit.status === 'Aceptada'"
+                          [class.text-success-700]="visit.status === 'Aceptada'"
+                          [class.bg-danger-50]="visit.status === 'Rechazada'"
+                          [class.text-danger-700]="visit.status === 'Rechazada'">
+                      {{ visit.status }}
+                    </span>
+                  </td>
+                  <td class="py-3 pr-4">
+                    @if (visit.status === 'Pendiente') {
+                      <div class="flex gap-2">
+                        <button (click)="accept(visit)"
+                                class="bg-success-600 hover:bg-success-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                          Aceptar
+                        </button>
+                        <button (click)="reject(visit)"
+                                class="bg-danger-600 hover:bg-danger-700 text-white text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors">
+                          Rechazar
+                        </button>
+                      </div>
+                    } @else {
+                      <span class="text-xs text-gray-400">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </div>
+  </div>
+</div>

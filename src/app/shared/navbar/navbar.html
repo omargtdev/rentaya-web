@@ -1,0 +1,37 @@
+<nav class="bg-white border-b border-gray-200">
+  <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+    <a routerLink="/properties" class="text-xl font-bold text-primary-600">RentaYa</a>
+
+    <div class="hidden sm:flex items-center gap-6 text-sm font-medium">
+      <a routerLink="/properties" routerLinkActive="text-primary-600" [routerLinkActiveOptions]="{exact:true}"
+         class="text-gray-600 hover:text-primary-600 transition-colors">Inmuebles</a>
+      <a routerLink="/favorites" routerLinkActive="text-primary-600"
+         class="text-gray-600 hover:text-primary-600 transition-colors">Favoritos</a>
+
+      @if (currentUser().role === 'PROPIETARIO') {
+        <a routerLink="/visits" routerLinkActive="text-primary-600"
+           class="text-gray-600 hover:text-primary-600 transition-colors">Solicitudes</a>
+      }
+
+      <a routerLink="/messages" routerLinkActive="text-primary-600"
+         class="text-gray-600 hover:text-primary-600 transition-colors">Mensajes</a>
+    </div>
+
+    <div class="flex items-center gap-3">
+      <!-- Selector de rol solo para demo/mock: simula el usuario autenticado -->
+      <select
+        class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 text-gray-600 bg-gray-50"
+        (change)="onRoleChange($event)"
+        [value]="currentUser().role"
+        title="Simular rol de sesión (solo demo)"
+      >
+        <option value="INQUILINO">Inquilino: {{ currentUser().role === 'INQUILINO' ? currentUser().firstName : 'Ana' }}</option>
+        <option value="PROPIETARIO">Propietario: {{ currentUser().role === 'PROPIETARIO' ? currentUser().firstName : 'Emir' }}</option>
+      </select>
+
+      <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center text-xs font-semibold">
+        {{ currentUser().firstName.charAt(0) }}{{ currentUser().lastName.charAt(0) }}
+      </div>
+    </div>
+  </div>
+</nav>
