@@ -56,6 +56,10 @@
       <div>
         @if (loading) {
           <p class="text-gray-500 text-sm">Cargando propiedades...</p>
+        } @else if (errorMessage) {
+          <div class="bg-danger-50 border border-danger-600 text-danger-700 rounded-xl p-5 text-sm">
+            {{ errorMessage }}
+          </div>
         } @else if (properties.length === 0) {
           <div class="bg-white border border-gray-200 rounded-xl p-10 text-center text-gray-500">
             No se encontraron propiedades con los filtros seleccionados.

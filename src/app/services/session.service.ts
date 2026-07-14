@@ -1,38 +1,26 @@
 import { Injectable, signal } from '@angular/core';
+import { Observable, tap } from 'rxjs';
 import { User, UserRole } from '../models/user.model';
+import { AuthService, LoginRequest, LoginResponse, UpdateProfileRequest } from './auth.service';
 
 /**
- * MOCK SESSION SERVICE
- * ---------------------------------------------------------
- * Mientras no exista integración con el backend (Spring Boot + JWT),
- * este servicio simula la sesión activa. Expone un signal `currentUser`
- * y permite alternar entre un usuario Propietario y uno Inquilino para
- * poder navegar y probar ambos flujos del prototipo.
- *
- * TODO(API): reemplazar por AuthService real que decodifique el JWT
- * devuelto por POST /api/auth/login y guarde el usuario autenticado.
+ * Servicio de sesión integrado con la API.
+ * Persiste JWT y usuario en localStorage para mantener la sesión al recargar.
  */
 @Injectable({ providedIn: 'root' })
 export class SessionService {
-  private readonly tenantMock: User = {
-    id: 10,
-    firstName: 'Ana',
-    lastName: 'López',
-    email: 'ana.lopez@correo.com',
-    phone: '987654321',
+  private readonly emptyUser: User = {
+    id: 0,
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
     role: 'INQUILINO'
   };
 
-  private readonly ownerMock: User = {
-    id: 2,
-    firstName: 'Emir',
-    lastName: 'Sánchez',
-    email: 'emir.sanchez@correo.com',
-    phone: '999888777',
-    role: 'PROPIETARIO'
-  };
+  readonly currentUser = signal<User>(this.readStoredUser());
 
-  readonly currentUser = signal<User>(this.ownerMock);
+  constructor(private authService: AuthService) {}
 
   get isOwner(): boolean {
     return this.currentUser().role === 'PROPIETARIO';
@@ -42,16 +30,65 @@ export class SessionService {
     return this.currentUser().role === 'INQUILINO';
   }
 
-  setRole(role: UserRole): void {
-    this.currentUser.set(role === 'PROPIETARIO' ? this.ownerMock : this.tenantMock);
+  get isAuthenticated(): boolean {
+    return !!this.token;
   }
 
-  updateUser(partial: Partial<Omit<User, 'id' | 'role'>>): void {
-    this.currentUser.update(u => ({ ...u, ...partial }));
+  get token(): string | null {
+    return localStorage.getItem('rentaya_token');
+  }
+
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.authService.login(request).pipe(
+      tap(response => this.storeSession(response))
+    );
+  }
+
+  refreshCurrentUser(): Observable<User> {
+    return this.authService.me().pipe(
+      tap(user => this.storeUser(user))
+    );
+  }
+
+  updateUser(partial: UpdateProfileRequest): Observable<User> {
+    return this.authService.updateMe(partial).pipe(
+      tap(user => this.storeUser(user))
+    );
+  }
+
+  clearSession(): void {
+    localStorage.removeItem('rentaya_token');
+    localStorage.removeItem('rentaya_user');
+    this.currentUser.set(this.emptyUser);
+  }
+
+  setRole(role: UserRole): void {
+    this.currentUser.update(user => ({ ...user, role }));
   }
 
   logout(): void {
-    // Reset to owner mock (default for next login)
-    this.currentUser.set(this.ownerMock);
+    if (this.token) {
+      this.authService.logout().subscribe({ error: () => undefined });
+    }
+    this.clearSession();
+  }
+
+  private storeSession(response: LoginResponse): void {
+    localStorage.setItem('rentaya_token', response.token);
+    this.storeUser(response.user);
+  }
+
+  private storeUser(user: User): void {
+    localStorage.setItem('rentaya_user', JSON.stringify(user));
+    this.currentUser.set(user);
+  }
+
+  private readStoredUser(): User {
+    try {
+      const raw = localStorage.getItem('rentaya_user');
+      return raw ? JSON.parse(raw) as User : this.emptyUser;
+    } catch {
+      return this.emptyUser;
+    }
   }
 }

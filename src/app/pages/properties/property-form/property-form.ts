@@ -1,10 +1,12 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpErrorResponse } from '@angular/common/http';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { PropertyService } from '../../../services/property.service';
 import { PropertyFormValue } from '../../../models/property.model';
 import { NavbarComponent } from '../../../shared/navbar/navbar';
+import { SessionService } from '../../../services/session.service';
 
 const PLACEHOLDER_PHOTOS = [
   'https://picsum.photos/seed/rentaya-new1/800/600',
@@ -26,6 +28,7 @@ const PLACEHOLDER_PHOTOS = [
 export class PropertyFormComponent implements OnInit {
   private fb = inject(FormBuilder);
   private propertyService = inject(PropertyService);
+  private session = inject(SessionService);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
 
@@ -54,6 +57,16 @@ export class PropertyFormComponent implements OnInit {
   get description() { return this.form.get('description'); }
 
   ngOnInit(): void {
+    if (!this.session.isAuthenticated) {
+      this.errorMessage = 'Debes iniciar sesión como propietario para publicar una propiedad.';
+      return;
+    }
+
+    if (!this.session.isOwner) {
+      this.errorMessage = 'Solo los propietarios pueden publicar o editar propiedades.';
+      return;
+    }
+
     const idParam = this.route.snapshot.paramMap.get('id');
     if (idParam) {
       this.isEditMode = true;
@@ -89,6 +102,16 @@ export class PropertyFormComponent implements OnInit {
   onSubmit(): void {
     this.errorMessage = '';
 
+    if (!this.session.isAuthenticated) {
+      this.errorMessage = 'Debes iniciar sesión como propietario para publicar una propiedad.';
+      return;
+    }
+
+    if (!this.session.isOwner) {
+      this.errorMessage = 'Solo los propietarios pueden publicar o editar propiedades.';
+      return;
+    }
+
     if (this.form.invalid) {
       this.form.markAllAsTouched();
       return;
@@ -119,10 +142,28 @@ export class PropertyFormComponent implements OnInit {
         this.submitting = false;
         this.router.navigate(['/properties', property.id]);
       },
-      error: (err: Error) => {
+      error: (err: unknown) => {
         this.submitting = false;
-        this.errorMessage = err.message;
+        this.errorMessage = this.getErrorMessage(err);
       }
     });
+  }
+
+  private getErrorMessage(error: unknown): string {
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 401) {
+        return 'Tu sesión expiró. Vuelve a iniciar sesión.';
+      }
+      if (error.status === 403) {
+        return error.error?.error || 'No tienes permisos para publicar o editar esta propiedad.';
+      }
+      if (error.status === 400 && error.error && typeof error.error === 'object') {
+        const firstMessage = Object.values(error.error)[0];
+        if (typeof firstMessage === 'string') return firstMessage;
+      }
+      return error.error?.error || 'No se pudo guardar la propiedad.';
+    }
+
+    return error instanceof Error ? error.message : 'No se pudo guardar la propiedad.';
   }
 }

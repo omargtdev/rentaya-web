@@ -19,13 +19,9 @@ export class LoginComponent {
   errorMessage = '';
   showPassword = false;
 
-  // Credenciales mock hardcodeadas para demo
-  readonly MOCK_EMAIL = 'emir.sanchez@correo.com';
-  readonly MOCK_PASSWORD = 'Demo1234';
-
   loginForm = this.fb.group({
-    email: [this.MOCK_EMAIL, [Validators.required, Validators.email]],
-    password: [this.MOCK_PASSWORD, [Validators.required, Validators.minLength(6)]]
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]]
   });
 
   get email() { return this.loginForm.get('email'); }
@@ -44,12 +40,19 @@ export class LoginComponent {
     this.loading = true;
     this.errorMessage = '';
 
-    // Mock login: cualquier combinación válida entra como propietario
-    setTimeout(() => {
-      this.loading = false;
-      // Simular login como propietario por defecto
-      this.session.setRole('PROPIETARIO');
-      this.router.navigate(['/properties']);
-    }, 800);
+    const value = this.loginForm.value;
+    this.session.login({
+      email: value.email!,
+      password: value.password!
+    }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.router.navigate(['/properties']);
+      },
+      error: () => {
+        this.loading = false;
+        this.errorMessage = 'Credenciales incorrectas o servicio no disponible.';
+      }
+    });
   }
 }

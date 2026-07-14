@@ -18,17 +18,6 @@
     </div>
 
     <div class="flex items-center gap-3">
-      <!-- Selector de rol solo para demo/mock: simula el usuario autenticado -->
-      <select
-        class="text-xs border border-gray-300 rounded-lg px-2 py-1.5 text-gray-600 bg-gray-50"
-        (change)="onRoleChange($event)"
-        [value]="currentUser().role"
-        title="Simular rol de sesión (solo demo)"
-      >
-        <option value="INQUILINO">Inquilino: {{ currentUser().role === 'INQUILINO' ? currentUser().firstName : 'Ana' }}</option>
-        <option value="PROPIETARIO">Propietario: {{ currentUser().role === 'PROPIETARIO' ? currentUser().firstName : 'Emir' }}</option>
-      </select>
-
       <!-- Profile avatar + dropdown -->
       <div class="relative">
         <button
