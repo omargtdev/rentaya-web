@@ -12,6 +12,7 @@ module.exports = {
           500: '#3B82F6',
           600: '#2563EB',
           700: '#1D4ED8',
+          800: '#1E40AF',
         },
         success: {
           50: '#F0FDF4',
@@ -30,6 +31,15 @@ module.exports = {
           200: '#FDE68A',
           600: '#D97706',
         },
+      },
+      keyframes: {
+        'fade-in': {
+          '0%': { opacity: '0', transform: 'translateY(-4px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+      },
+      animation: {
+        'fade-in': 'fade-in 0.15s ease-out',
       },
     },
   },
