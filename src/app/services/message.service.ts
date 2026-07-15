@@ -3,15 +3,18 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ChatMessage, Conversation } from '../models/message.model';
 import { Property } from '../models/property.model';
+import { ConfigService } from './config.service';
 
 /**
  * Servicio de conversaciones y mensajes integrado con la API.
  */
 @Injectable({ providedIn: 'root' })
 export class MessageService {
-  private readonly baseUrl = '/api/conversations';
+  private get baseUrl(): string {
+    return `${this.config.apiUrl}/api/conversations`;
+  }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   getConversations(): Observable<Conversation[]> {
     return this.http.get<Conversation[]>(this.baseUrl);

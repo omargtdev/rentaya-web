@@ -3,15 +3,18 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { Property, PropertyFilters, PropertyFormValue } from '../models/property.model';
+import { ConfigService } from './config.service';
 
 /**
  * Servicio de propiedades integrado con la API.
  */
 @Injectable({ providedIn: 'root' })
 export class PropertyService {
-  private readonly baseUrl = '/api/properties';
+  private get baseUrl(): string {
+    return `${this.config.apiUrl}/api/properties`;
+  }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   getAll(filters?: PropertyFilters): Observable<Property[]> {
     let params = new HttpParams();

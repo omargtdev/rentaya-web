@@ -3,11 +3,20 @@ import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { catchError, throwError } from 'rxjs';
 
+function isApiRequest(url: string): boolean {
+  try {
+    const parsed = new URL(url, window.location.origin);
+    return parsed.pathname.startsWith('/api/');
+  } catch {
+    return url.startsWith('/api/');
+  }
+}
+
 export const authInterceptor: HttpInterceptorFn = (request, next) => {
   const router = inject(Router);
   const token = localStorage.getItem('rentaya_token');
 
-  if (!token || !request.url.startsWith('/api')) {
+  if (!token || !isApiRequest(request.url)) {
     return next(request);
   }
 

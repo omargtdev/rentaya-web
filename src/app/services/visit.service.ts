@@ -2,15 +2,18 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Visit, VisitStatus } from '../models/visit.model';
+import { ConfigService } from './config.service';
 
 /**
  * Servicio de visitas integrado con la API.
  */
 @Injectable({ providedIn: 'root' })
 export class VisitService {
-  private readonly baseUrl = '/api/visits';
+  private get baseUrl(): string {
+    return `${this.config.apiUrl}/api/visits`;
+  }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   getByOwner(ownerId: number): Observable<Visit[]> {
     return this.http.get<Visit[]>(`${this.baseUrl}/owner`);

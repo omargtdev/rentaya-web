@@ -1,18 +1,15 @@
 #!/bin/sh
 set -e
 
-# Debug: show the API_URL value
+# Write runtime config.json so the Angular app knows the backend URL
+cat > /usr/share/nginx/html/config.json <<EOF
+{"apiUrl":"${API_URL}"}
+EOF
+
 echo "API_URL=${API_URL}"
-
-# Substitute environment variables in nginx config
-envsubst '\$API_URL' < /etc/nginx/conf.d/default.conf > /etc/nginx/conf.d/default.conf.tmp
-
-# Debug: show the substituted config
-echo "--- Generated nginx config ---"
-cat /etc/nginx/conf.d/default.conf.tmp
-echo "--- End nginx config ---"
-
-mv /etc/nginx/conf.d/default.conf.tmp /etc/nginx/conf.d/default.conf
+echo "--- Generated config.json ---"
+cat /usr/share/nginx/html/config.json
+echo "--- End config.json ---"
 
 # Test nginx config before starting
 nginx -t

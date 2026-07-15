@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { User } from '../models/user.model';
+import { ConfigService } from './config.service';
 
 export interface RegisterRequest {
   firstName: string;
@@ -38,12 +39,12 @@ export type UpdateProfileRequest = Pick<User, 'firstName' | 'lastName' | 'email'
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly registerUrl = '/api/users/register';
-  private readonly loginUrl = '/api/auth/login';
-  private readonly logoutUrl = '/api/auth/logout';
-  private readonly meUrl = '/api/users/me';
+  private get registerUrl(): string { return `${this.config.apiUrl}/api/users/register`; }
+  private get loginUrl(): string { return `${this.config.apiUrl}/api/auth/login`; }
+  private get logoutUrl(): string { return `${this.config.apiUrl}/api/auth/logout`; }
+  private get meUrl(): string { return `${this.config.apiUrl}/api/users/me`; }
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   register(request: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(this.registerUrl, request).pipe(

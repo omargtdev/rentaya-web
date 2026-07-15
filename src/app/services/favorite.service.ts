@@ -3,16 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { Property } from '../models/property.model';
+import { ConfigService } from './config.service';
 
 /**
  * Servicio de favoritos integrado con la API.
  */
 @Injectable({ providedIn: 'root' })
 export class FavoriteService {
-  private readonly baseUrl = '/api/favorites';
+  private get baseUrl(): string {
+    return `${this.config.apiUrl}/api/favorites`;
+  }
   readonly favoriteIds = signal<Set<number>>(new Set());
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private config: ConfigService) {}
 
   isFavorite(propertyId: number): boolean {
     return this.favoriteIds().has(propertyId);
