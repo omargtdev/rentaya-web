@@ -3,7 +3,7 @@ import { Visit } from '../models/visit.model';
 import { Conversation, ChatMessage } from '../models/message.model';
 
 /**
- * Datos semilla (mock) para HU03-HU10.
+ * Datos semilla (mock).
  * TODO(API): eliminar este archivo por completo cuando los datos
  * provengan de PostgreSQL vía los endpoints REST del backend.
  */

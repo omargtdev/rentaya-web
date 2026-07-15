@@ -28,7 +28,7 @@ export class VisitService {
   }
 
   /**
-   * Reglas de negocio (HU06):
+   * Reglas de negocio:
    * - No se permiten fechas anteriores al día actual.
    * - Un inquilino no puede tener más de 1 solicitud pendiente por propiedad.
    */
