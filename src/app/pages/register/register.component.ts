@@ -1,12 +1,12 @@
 import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService, RegisterRequest } from '../../services/auth.service';
 
 @Component({
   selector: 'app-register',
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterLink],
   templateUrl: './register.html',
   standalone: true
 })
@@ -19,6 +19,7 @@ export class RegisterComponent {
   loading = false;
   successMessage = '';
   errorMessage = '';
+  showPassword = false;
 
   registerForm = this.fb.group({
     firstName: ['', [Validators.required]],
@@ -35,6 +36,10 @@ export class RegisterComponent {
   get phone() { return this.registerForm.get('phone'); }
   get password() { return this.registerForm.get('password'); }
   get role() { return this.registerForm.get('role'); }
+
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
 
   onSubmit(): void {
     if (this.registerForm.invalid) {
