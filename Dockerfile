@@ -14,6 +14,9 @@ RUN npm run build
 # Stage 2: Runtime
 FROM nginx:alpine
 
+# Install envsubst (gettext) for environment variable substitution
+RUN apk add --no-cache gettext
+
 # Copy built Angular app
 COPY --from=builder /app/dist/rentaya-web/browser /usr/share/nginx/html
 
