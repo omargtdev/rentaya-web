@@ -28,9 +28,15 @@ export class FavoritesComponent implements OnInit {
 
   private load(): void {
     this.loading = true;
-    this.favoriteService.list().subscribe(list => {
-      this.properties = list;
-      this.loading = false;
+    this.favoriteService.list().subscribe({
+      next: list => {
+        this.properties = list;
+        this.loading = false;
+      },
+      error: () => {
+        this.properties = [];
+        this.loading = false;
+      }
     });
   }
 }

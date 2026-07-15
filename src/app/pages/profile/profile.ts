@@ -65,19 +65,21 @@ export class ProfileComponent {
 
     this.saving = true;
 
-    // Mock: simulate API call
-    setTimeout(() => {
-      // Update session with new values
-      const v = this.profileForm.value;
-      this.session.updateUser({
+    const v = this.profileForm.value;
+    this.session.updateUser({
         firstName: v.firstName!,
         lastName: v.lastName!,
         email: v.email!,
         phone: v.phone!
-      });
-      this.saving = false;
-      this.saved = true;
-      this.editingSection = null;
-    }, 700);
+    }).subscribe({
+      next: () => {
+        this.saving = false;
+        this.saved = true;
+        this.editingSection = null;
+      },
+      error: () => {
+        this.saving = false;
+      }
+    });
   }
 }

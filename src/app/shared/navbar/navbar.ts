@@ -2,7 +2,6 @@ import { Component, inject, signal, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink, RouterLinkActive } from '@angular/router';
 import { SessionService } from '../../services/session.service';
-import { FavoriteService } from '../../services/favorite.service';
 
 @Component({
   selector: 'app-navbar',
@@ -12,17 +11,10 @@ import { FavoriteService } from '../../services/favorite.service';
 })
 export class NavbarComponent {
   private session = inject(SessionService);
-  private favorites = inject(FavoriteService);
   private router = inject(Router);
 
   currentUser = this.session.currentUser;
   profileDropdownOpen = signal(false);
-
-  onRoleChange(event: Event): void {
-    const role = (event.target as HTMLSelectElement).value as 'PROPIETARIO' | 'INQUILINO';
-    this.session.setRole(role);
-    this.favorites.reloadForCurrentUser();
-  }
 
   toggleProfileDropdown(): void {
     this.profileDropdownOpen.update(v => !v);

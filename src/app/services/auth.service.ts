@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import { User } from '../models/user.model';
 
 export interface RegisterRequest {
   firstName: string;
@@ -21,23 +22,58 @@ export interface RegisterResponse {
   role: 'PROPIETARIO' | 'INQUILINO';
 }
 
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+export type UpdateProfileRequest = Pick<User, 'firstName' | 'lastName' | 'email' | 'phone'>;
+
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly apiUrl = '/api/users/register';
+  private readonly registerUrl = '/api/users/register';
+  private readonly loginUrl = '/api/auth/login';
+  private readonly logoutUrl = '/api/auth/logout';
+  private readonly meUrl = '/api/users/me';
 
   constructor(private http: HttpClient) {}
 
   register(request: RegisterRequest): Observable<RegisterResponse> {
-    return this.http.post<RegisterResponse>(this.apiUrl, request).pipe(
+    return this.http.post<RegisterResponse>(this.registerUrl, request).pipe(
       catchError((error: HttpErrorResponse) => {
         if (error.status === 409) {
           const message = error.error?.email || 'El correo ya está registrado';
           return throwError(() => new Error(message));
         }
+        if (error.status === 400 && error.error && typeof error.error === 'object') {
+          const firstMessage = Object.values(error.error)[0];
+          return throwError(() => new Error(typeof firstMessage === 'string' ? firstMessage : 'Datos inválidos.'));
+        }
         return throwError(() => new Error('Error en el registro. Inténtalo de nuevo.'));
       })
     );
+  }
+
+  login(request: LoginRequest): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(this.loginUrl, request);
+  }
+
+  logout(): Observable<void> {
+    return this.http.post<void>(this.logoutUrl, {});
+  }
+
+  me(): Observable<User> {
+    return this.http.get<User>(this.meUrl);
+  }
+
+  updateMe(request: UpdateProfileRequest): Observable<User> {
+    return this.http.patch<User>(this.meUrl, request);
   }
 }
