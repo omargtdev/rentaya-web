@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -14,6 +14,7 @@ export class LoginComponent {
   private fb = inject(FormBuilder);
   private router = inject(Router);
   private session = inject(SessionService);
+  private cdr = inject(ChangeDetectorRef);
 
   loading = false;
   errorMessage = '';
@@ -47,11 +48,13 @@ export class LoginComponent {
     }).subscribe({
       next: () => {
         this.loading = false;
+        this.cdr.detectChanges();
         this.router.navigate(['/properties']);
       },
       error: () => {
         this.loading = false;
         this.errorMessage = 'Credenciales incorrectas o servicio no disponible.';
+        this.cdr.detectChanges();
       }
     });
   }
