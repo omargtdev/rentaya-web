@@ -19,9 +19,15 @@ export class ConfigService {
   constructor(private http: HttpClient) {}
 
   async load(): Promise<void> {
-    this._config = await firstValueFrom(
-      this.http.get<AppConfig>('config.json')
-    );
+    try {
+      this._config = await firstValueFrom(
+        this.http.get<AppConfig>('config.json')
+      );
+      console.log('[ConfigService] Loaded config:', this._config);
+    } catch (error) {
+      console.warn('[ConfigService] Failed to load config.json, using empty fallback. Error:', error);
+      this._config = { apiUrl: '' };
+    }
   }
 
   get apiUrl(): string {
